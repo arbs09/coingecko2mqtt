@@ -8,7 +8,7 @@ broker = os.getenv('BROKER')
 port = int(os.getenv('BROKER_PORT', 1883))
 username = os.getenv('BROKER_USERNAME','')
 password = os.getenv('BROKER_PASSWORD','')
-topic = os.getenv('TOPIC', 'coingecko')
+topic = os.getenv('TOPIC', 'coingecko2mqtt')
 sleep_time = int(os.getenv('SLEEP_TIME', 30))
 MQTT_CLIENT_ID = "coingecko2mqtt"
 
