@@ -40,21 +40,23 @@ def connect_mqtt():
 
 
 def get_price(coin):
-    data = cg.get_price(ids=coin, vs_currencies=Corrency)
-    return data[str(coin)][Corrency]
+    data = cg.get_price(ids=coin, vs_currencies=Corrency, include_24hr_change='true')
+    return data[coin][Corrency], data[coin][f'{Corrency}_24h_change']
 
 def publish(client):
-     while True:
-         time.sleep(sleep_time)
-         price = get_price(coin)
-         publish_topic = topic + "/" + coin + "/price"
-         msg = f"{price} {Corrency}"
-         result = client.publish(publish_topic, msg)
-         status = result[0]
-         if status == 0:
-             print(f"Send `{msg}` to topic `{publish_topic}`")
-         else:
-             print(f"Failed to send message to topic {topic}")
+    while True:
+        time.sleep(sleep_time)
+        price, change24h = get_price(coin)
+        publish_topic = topic + "/" + coin
+        msg = f"{price} {Corrency} , 24h change: {change24h}%"
+        result_price = client.publish(publish_topic + "/price", msg)
+        result_24h_change = client.publish(publish_topic + "/24h_change", change24h)
+        status_price = result_price.rc
+        status_24h_change = result_24h_change.rc
+        if status_price == 0 and status_24h_change == 0:
+            print(f"Send `{msg}` to topic `{publish_topic}`")
+        else:
+            print(f"Failed to send message to topic {publish_topic}")
 
 
 def run():
