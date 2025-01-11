@@ -1,0 +1,14 @@
+services:
+  app:
+    container_name: coingecko2mqtt
+    image: ghcr.io/arbs09/coingecko2mqtt:main
+    environment:
+      - BROKER=value
+      - BROKER_PORT=value
+      - BROKER_USER=value
+      - BROKER_PASSWORD=value
+      - SLEEP_TIME=30
+      - COINGECKO_KEY=value
+      - CORRENCY=usd
+      - COIN=bitcoin
+    restart: unless-stopped
