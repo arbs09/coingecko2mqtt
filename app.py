@@ -16,7 +16,7 @@ CoinGeckoKey = os.getenv('COINGECKO_KEY', '')
 
 Corrency = os.getenv('CORRENCY', 'usd')
 
-coin = os.getenv('COIN', 'bitcoin')
+coins = os.getenv('COIN', 'bitcoin').split(',')
 
 if CoinGeckoKey:
     cg = CoinGeckoAPI(demo_api_key=CoinGeckoKey)
@@ -46,19 +46,22 @@ def get_price(coin):
 def publish(client):
     while True:
         time.sleep(sleep_time)
-        price, change24h = get_price(coin)
-        price = f"{price} {Corrency}"
-        change24h = f"{change24h}%"
-        publish_topic = topic + "/" + coin
-        msg = f"{price} {Corrency} , 24h change: {change24h}%"
-        result_price = client.publish(publish_topic + "/price", price)
-        result_24h_change = client.publish(publish_topic + "/24h_change", change24h)
-        status_price = result_price.rc
-        status_24h_change = result_24h_change.rc
-        if status_price == 0 and status_24h_change == 0:
-            print(f"Send `{msg}` to topic `{publish_topic}`")
-        else:
-            print(f"Failed to send message to topic {publish_topic}")
+        for coin in coins:
+            price, change24h = get_price(coin)
+            if price is None or change24h is None:
+                continue
+            price_str = f"{price} {Corrency}"
+            change24h_str = f"{change24h}%"
+            publish_topic = topic + "/" + coin
+            msg = f"{price_str} , 24h change: {change24h_str}"
+            result_price = client.publish(publish_topic + "/price", price_str)
+            result_24h_change = client.publish(publish_topic + "/24h_change", change24h_str)
+            status_price = result_price.rc
+            status_24h_change = result_24h_change.rc
+            if status_price == 0 and status_24h_change == 0:
+                print(f"Send `{msg}` to topic `{publish_topic}`")
+            else:
+                print(f"Failed to send message to topic {publish_topic}")
 
 
 def run():
