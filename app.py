@@ -46,7 +46,7 @@ def get_price(coin):
 def publish(client):
     while True:
         time.sleep(sleep_time)
-        change24h, price = get_price(coin)
+        price, change24h = get_price(coin)
         publish_topic = topic + "/" + coin
         msg = f"{price} {Corrency} , 24h change: {change24h}%"
         result_price = client.publish(publish_topic + "/price", price)
