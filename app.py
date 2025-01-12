@@ -39,17 +39,19 @@ def connect_mqtt():
     return client
 
 
-def get_price(coin):
-    data = cg.get_price(ids=coin, vs_currencies=Corrency, include_24hr_change='true')
-    return data[coin][Corrency], data[coin][f'{Corrency}_24h_change']
+def get_prices(coins):
+    data = cg.get_price(ids=','.join(coins), vs_currencies=Corrency, include_24hr_change='true')
+    return data
 
 def publish(client):
     while True:
         time.sleep(sleep_time)
+        prices = get_prices(coins)
         for coin in coins:
-            price, change24h = get_price(coin)
-            if price is None or change24h is None:
+            if coin not in prices:
                 continue
+            price = prices[coin][Corrency]
+            change24h = prices[coin][f'{Corrency}_24h_change']
             publish_topic = topic + "/" + coin
             msg = f"{price} , 24h change: {change24h}"
             result_price = client.publish(publish_topic + "/price", price)
