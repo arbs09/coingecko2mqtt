@@ -18,6 +18,8 @@ Corrency = os.getenv('CORRENCY', 'usd')
 
 coins = os.getenv('COIN', 'bitcoin').split(',')
 
+firstrun = True
+
 if CoinGeckoKey:
     cg = CoinGeckoAPI(demo_api_key=CoinGeckoKey)
 else:
@@ -44,8 +46,10 @@ def get_prices(coins):
     return data
 
 def publish(client):
+    global firstrun
     while True:
-        time.sleep(sleep_time)
+        if not firstrun == True:
+            time.sleep(sleep_time)
         prices = get_prices(coins)
         for coin in coins:
             if coin not in prices:
@@ -62,11 +66,14 @@ def publish(client):
                 print(f"Send `{msg}` to topic `{publish_topic}`")
             else:
                 print(f"Failed to send message to topic {publish_topic}")
+        firstrun = False
 
 
 def run():
+    global firstrun
     client = connect_mqtt()
     client.loop_start()
+    firstrun = True
     publish(client)
     client.loop_stop()
 
